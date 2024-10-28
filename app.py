@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
+from flask import Flask, request, render_template, redirect, url_for, flash, jsonify, Response
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
@@ -10,9 +10,9 @@ app.secret_key = 'saksamtechnologies@tenkasi627808'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
-app.config['MAIL_PASSWORD'] = 'your_password'
-app.config['MAIL_DEFAULT_SENDER'] = ('SakSam Technologies', 'your_email@gmail.com')
+app.config['MAIL_USERNAME'] = 'saksam.technologies2021@gmail.com'
+app.config['MAIL_PASSWORD'] = 'zntw vdia djyv iugh'
+app.config['MAIL_DEFAULT_SENDER'] = ('SakSam Technologies', 'saksam.technologies2021@gmail.com')
 
 # Initialize Flask-Mail
 mail = Mail(app)
@@ -42,7 +42,7 @@ def services():
     return render_template('services.html')
 
 # Route to handle form submission
-@app.route('/send/contact', methods=['POST'])
+@app.route('/send/contact', methods=['POST','GET'])
 def send_contact():
     name = request.form.get('name')
     email = request.form.get('email')
@@ -54,22 +54,90 @@ def send_contact():
         return redirect(url_for('contact'))
 
     try:
-        msg = Message(f"New Contact Form Submission from {name}",
-                      recipients=['your_email@gmail.com'])
+        msg = Message(
+            subject=f"New Contact Form Submission from {name}",
+            recipients=['saksamtech21@gmail.com']
+        )
         msg.body = f"""
-        Name: {name}
-        Email: {email}
-        Phone: {phone}
-        Message: {message}
+        Hello SakSam Technologies Team,
+
+        You have received a new message via the contact form on your website. Here are the details:
+
+        -------------------------------------------
+        👤 **Name**: {name}
+        ✉️ **Email**: {email}
+        📞 **Phone**: {phone if phone else "Not Provided"}
+        -------------------------------------------
+
+        📌 **Message**:
+        {message}
+
+        Thank you for using our contact form. We appreciate the opportunity to connect with you.
+
+        Best Regards,
+        Your SakSam Technologies Website
         """
-        # Send the email
+
+        msg.html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    color: #333;
+                }}
+                .container {{
+                    width: 80%;
+                    margin: 0 auto;
+                    padding: 20px;
+                }}
+                .header {{
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #555;
+                }}
+                .details {{
+                    margin-top: 20px;
+                    font-size: 16px;
+                }}
+                .footer {{
+                    margin-top: 20px;
+                    font-size: 14px;
+                    color: #888;
+                }}
+                .highlight {{
+                    color: #007BFF;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">📩 New Contact Form Submission</div>
+                <hr>
+                <div class="details">
+                    <p><strong class="highlight">Name:</strong> {name}</p>
+                    <p><strong class="highlight">Email:</strong> {email}</p>
+                    <p><strong class="highlight">Phone:</strong> {phone if phone else "Not Provided"}</p>
+                    <hr>
+                    <p><strong class="highlight">Message:</strong></p>
+                    <p>{message}</p>
+                </div>
+                <div class="footer">
+                    <p>Best Regards,<br>SakSam Technologies Website</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        # Sending the email
         mail.send(msg)
         flash('Your message has been sent successfully!', 'success')
+        return 'Success'
     except Exception as e:
         print(f"Error sending email: {e}")
-        flash('Failed to send message. Please try again later.', 'error')
+        return 'Failed'
 
-    return redirect(url_for('contact'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
