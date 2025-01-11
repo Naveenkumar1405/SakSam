@@ -41,6 +41,11 @@ def contact():
 def services():
     return render_template('services.html')
 
+# Route for the gallery page
+@app.route('/gallery')
+def gallery():
+    return render_template('gallery.html')
+
 # Route to handle form submission
 @app.route('/send/contact', methods=['POST','GET'])
 def send_contact():
